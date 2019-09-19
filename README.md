@@ -1,2 +1,2 @@
-# Super_Sploit
+# Supersploit
 A better way to searchsploit...
