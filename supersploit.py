@@ -83,8 +83,8 @@ def local_or_metasploit(is_metasploit, target_os, target):
     return list_builder(format_stripper(runcommand(searchsploit_command)))
  
  
-def copy_exploit(list_of_lists, copy_pathway):
-    exploit = list_of_lists[int(copy) - 1][1]
+def copy_exploit(list_of_lists, copy_pathway, exploit_num):
+    exploit = list_of_lists[int(exploit_num) - 1][1]
     all_exploit_path = "/usr/share/exploitdb/" + exploit
     runcommand("cp " + all_exploit_path + " " + copy_pathway)
     
@@ -161,12 +161,12 @@ def main():
     if metasploitable == True:
         metasploit_open(reference_list, copy)
     else:
-        file_cp_dest = input_check("Type C copy to corrent directory OR T copy to /tmp    ", "Invalid input. Expected C or T", validate_list, ["C", "c", "T", "t"])
+        file_cp_dest = input_check("Type C copy to current directory OR T copy to /tmp    ", "Invalid input. Expected C or T", validate_list, ["C", "c", "T", "t"])
         if file_cp_dest in ["c", "C"]:
             final_file_path = "."
         elif file_cp_dest in ["t", "T"]:
             final_file_path = "/tmp"
-        copy_exploit(reference_list, final_file_path)
+        copy_exploit(reference_list, final_file_path, copy)
  
  
     print(banner_message("end"))
