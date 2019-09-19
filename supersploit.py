@@ -84,9 +84,9 @@ def local_or_metasploit(is_metasploit, target_os, target):
  
  
 def copy_exploit(list_of_lists, copy_pathway):
-    exploit_disc1 = list_of_lists[int(copy) - 1][1]
-    all_exploit_path = "/usr/share/exploitdb/" + list_of_lists[int(copy) - 1][1]
-    user_path = runcommand("cp " + all_exploit_path + " " + copy_pathway)
+    exploit = list_of_lists[int(copy) - 1][1]
+    all_exploit_path = "/usr/share/exploitdb/" + exploit
+    runcommand("cp " + all_exploit_path + " " + copy_pathway)
     
  
 # Generate the current time for .rc file name
