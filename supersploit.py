@@ -32,12 +32,12 @@ def banner_message(message):
     """
     if message == "again":
         return """
-     ████████╗██████╗ ██╗   ██╗     █████╗  ██████╗  █████╗ ██╗███╗   ██╗    ██████╗ ██████╗  ██████╗ 
-     ╚══██╔══╝██╔══██╗╚██╗ ██╔╝    ██╔══██╗██╔════╝ ██╔══██╗██║████╗  ██║    ██╔══██╗██╔══██╗██╔═══██╗
-        ██║   ██████╔╝ ╚████╔╝     ███████║██║  ███╗███████║██║██╔██╗ ██║    ██████╔╝██████╔╝██║   ██║
-        ██║   ██╔══██╗  ╚██╔╝      ██╔══██║██║   ██║██╔══██║██║██║╚██╗██║    ██╔══██╗██╔══██╗██║   ██║
-        ██║   ██║  ██║   ██║       ██║  ██║╚██████╔╝██║  ██║██║██║ ╚████║    ██████╔╝██║  ██║╚██████╔╝
-        ╚═╝   ╚═╝  ╚═╝   ╚═╝       ╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝╚═╝╚═╝  ╚═══╝    ╚═════╝ ╚═╝  ╚═╝ ╚═════╝
+    ████████╗██████╗ ██╗   ██╗     █████╗  ██████╗  █████╗ ██╗███╗   ██╗    ██████╗ ██████╗  ██████╗ 
+    ╚══██╔══╝██╔══██╗╚██╗ ██╔╝    ██╔══██╗██╔════╝ ██╔══██╗██║████╗  ██║    ██╔══██╗██╔══██╗██╔═══██╗
+       ██║   ██████╔╝ ╚████╔╝     ███████║██║  ███╗███████║██║██╔██╗ ██║    ██████╔╝██████╔╝██║   ██║
+       ██║   ██╔══██╗  ╚██╔╝      ██╔══██║██║   ██║██╔══██║██║██║╚██╗██║    ██╔══██╗██╔══██╗██║   ██║
+       ██║   ██║  ██║   ██║       ██║  ██║╚██████╔╝██║  ██║██║██║ ╚████║    ██████╔╝██║  ██║╚██████╔╝
+       ╚═╝   ╚═╝  ╚═╝   ╚═╝       ╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝╚═╝╚═╝  ╚═══╝    ╚═════╝ ╚═╝  ╚═╝ ╚═════╝
     """
     if message == "wait":
         return """
@@ -107,7 +107,7 @@ def file_name_date(date_format):
     return x.strftime(date_format)
  
 
-# Generate the .rc file to open msfconsole.
+# Generate the .rc file in /tmp to open msfconsole with -r option.
 def metasploit_open(list_of_lists_two, user_selection):
     exploit_disc = list_of_lists_two[int(user_selection) - 1][0]
     search_term_msfconsole = exploit_disc[exploit_disc.index(" - ") + 3 : exploit_disc.index(" (Metasploit)")]
@@ -116,6 +116,7 @@ def metasploit_open(list_of_lists_two, user_selection):
     open_msfconsole = '/tmp/' + tmp_file + ".rc"
     runcommand("echo search name:" + search_term_msfconsole + " > " + open_msfconsole )
     subprocess.run(["msfconsole", "-r", open_msfconsole])
+    return open_msfconsole
         
 
 # build or append user activity to the supersploit log.
@@ -179,7 +180,7 @@ def main():
     # differentiate local or metasploit exploits
     if metasploitable == True:
         print(banner_message("wait"))
-        metasploit_open(reference_list, copy)
+        tmp_file = metasploit_open(reference_list, copy)
     else:
         file_cp_dest = input_check("Type C copy to current directory OR T copy to /tmp    ", "Invalid input. Expected C or T", validate_list, ["C", "c", "T", "t"])
         if file_cp_dest in ["c", "C"]:
@@ -188,6 +189,8 @@ def main():
             final_file_path = "/tmp"
         copy_exploit(reference_list, final_file_path, copy)
     
+    print(tmp_file)
+    runcommand("rm -r %s" % (tmp_file))
     # farewell message
     print(banner_message("end"))
  
