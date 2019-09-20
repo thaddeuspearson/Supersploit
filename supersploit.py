@@ -115,7 +115,7 @@ def metasploit_open(list_of_lists_two, user_selection):
     tmp_file = file_name_date("%I%M%S%m%d%y")
     log_builder(exploit_path)
     open_msfconsole = '/tmp/' + tmp_file + ".rc"
-    runcommand(("echo search -u -S \\'%s\\' description:\\'%s\\'" % (name,name)) + " > " + open_msfconsole)
+    runcommand(("echo search -S \\'%s\\' description:\\'%s\\'" % (name,name)) + " > " + open_msfconsole)
     subprocess.run(["msfconsole", "-r", open_msfconsole])
     return open_msfconsole
 
@@ -125,7 +125,7 @@ def exploit_path_to_name(path):
     absolute_path ="/usr/share/exploitdb/" + path
     f = open(absolute_path)
     for line in f:
-        match = re.findall(r"'Name'\s*=>\s*('.*')", line)
+        match = re.findall(r"'Name'\s*=>\s*(['\"].*['\"])", line)
         #print(match)
         if len(match) > 0:
             return match[0]
