@@ -10,7 +10,7 @@ import subprocess
 import datetime
 import os
 import re
-import time
+
  
 # banner printing function
 def banner_message(message):
