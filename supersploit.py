@@ -107,17 +107,28 @@ def file_name_date(date_format):
     x = datetime.datetime.now()
     return x.strftime(date_format)
  
-
-# open Metasploit with the user selected search parameters
+ # Generate the .rc file to open msfconsole
 def metasploit_open(list_of_lists_two, user_selection):
-    exploit_path = list_of_lists_two[int(user_selection) - 1][1]
-    name = exploit_path_to_name(exploit_path)
+
+    exploit_disc = list_of_lists_two[int(user_selection) - 1][0]
+    search_term_msfconsole = exploit_disc[exploit_disc.index(" - ") + 3 : exploit_disc.index(" (Metasploit)")]
     tmp_file = file_name_date("%I%M%S%m%d%y")
-    log_builder(exploit_path)
+    log_builder(exploit_disc)
     open_msfconsole = '/tmp/' + tmp_file + ".rc"
-    runcommand(("echo search -S \\'%s\\' description:\\'%s\\'" % (name,name)) + " > " + open_msfconsole)
+    runcommand("echo search name:" + search_term_msfconsole + " > " + open_msfconsole )
     subprocess.run(["msfconsole", "-r", open_msfconsole])
-    return open_msfconsole
+
+# # BETA FUNCTION: open Metasploit with the user selected search parameters
+# def metasploit_open(list_of_lists_two, user_selection):
+#     exploit_path = list_of_lists_two[int(user_selection) - 1][1]
+#     name = exploit_path_to_name(exploit_path)
+#     tmp_file = file_name_date("%I%M%S%m%d%y")
+#     log_builder(exploit_path)
+#     open_msfconsole = '/tmp/' + tmp_file + ".rc"
+#     #runcommand(("echo search -S \\'%s\\' description:\\'%s\\'" % (name,name)) + " > " + open_msfconsole)
+#     runcommand(("echo search name:\\'%s\\'" % (name)) + " > " + open_msfconsole)
+#     subprocess.run(["msfconsole", "-r", open_msfconsole])
+#     return open_msfconsole
 
 
 # search the local exploit for the Metasploit exploit name
