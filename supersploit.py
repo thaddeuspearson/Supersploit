@@ -4,13 +4,15 @@
 #   Feature: A improved sulotion of using Searchsploit and Metasploit
 #   Version: 0.0.1 (2019-09-16)
 #   Written by: Thaddeus Pearson, RedsHort
-#   Homepage: https://github.com/thaddeuspearson/Super_Sploit
+#   Homepage: https://github.com/thaddeuspearson/Supersploit
  
 import subprocess
 import datetime
 import os
+import re
+import time
  
-# Banner printing function
+# banner printing function
 def banner_message(message):
     if message == "start":
         return """
@@ -50,14 +52,14 @@ def banner_message(message):
     """
  
     
-# This is a function for running bash script
+# this is a function for running bash script
 def runcommand(cmd):
     output = subprocess.run(cmd, shell = True, capture_output = True)
     list_string = output.stdout.decode("utf-8")
     return list_string
 
  
-# Removes the format of the searchsploit result
+# removes the format of the searchsploit result
 def format_stripper(searchsploit_output):
     output_simple = searchsploit_output.split('\n')
     if '(Metasploit)' in output_simple[0]:  
@@ -68,7 +70,7 @@ def format_stripper(searchsploit_output):
     return [" ".join(i.split()) for i in output_simpler]
 
  
-# Build the selection list.
+# build the selection list.
 def list_builder(new_list1):
     result_list = []
     for entry in new_list1:
@@ -77,7 +79,7 @@ def list_builder(new_list1):
     return result_list
 
  
-# Format the selection list.
+# format the selection list.
 def pretty(origin_list):
     print_string = ""
     for i in origin_list:
@@ -87,7 +89,7 @@ def pretty(origin_list):
     return print_string
  
 
-# User selection of local or Metasploit exploits.
+# user selection of local or Metasploit exploits.
 def local_or_metasploit(is_metasploit, target_os, target):
     flag = "" if is_metasploit else "-v"
     searchsploit_command = "searchsploit --colour --overflow %s %s | grep  %s  '(Metasploit)' " % (target_os, target, flag)
@@ -101,23 +103,34 @@ def copy_exploit(list_of_lists, copy_pathway, exploit_num):
     runcommand("cp " + all_exploit_path + " " + copy_pathway)
     
  
-# Generate the current time for .rc file name.
+# generate the current time for .rc file name.
 def file_name_date(date_format):
     x = datetime.datetime.now()
     return x.strftime(date_format)
  
 
-# Generate the .rc file in /tmp to open msfconsole with -r option.
+# open Metasploit with the user selected search parameters
 def metasploit_open(list_of_lists_two, user_selection):
-    exploit_disc = list_of_lists_two[int(user_selection) - 1][0]
-    search_term_msfconsole = exploit_disc[exploit_disc.index(" - ") + 3 : exploit_disc.index(" (Metasploit)")]
+    exploit_path = list_of_lists_two[int(user_selection) - 1][1]
+    name = exploit_path_to_name(exploit_path)
     tmp_file = file_name_date("%I%M%S%m%d%y")
-    log_builder(exploit_disc)
+    log_builder(exploit_path)
     open_msfconsole = '/tmp/' + tmp_file + ".rc"
-    runcommand("echo search name:" + search_term_msfconsole + " > " + open_msfconsole )
+    runcommand(("echo search -u -S \\'%s\\' description:\\'%s\\'" % (name,name)) + " > " + open_msfconsole)
     subprocess.run(["msfconsole", "-r", open_msfconsole])
     return open_msfconsole
-        
+
+
+# search the local exploit for the Metasploit exploit name
+def exploit_path_to_name(path):
+    absolute_path ="/usr/share/exploitdb/" + path
+    f = open(absolute_path)
+    for line in f:
+        match = re.findall(r"'Name'\s*=>\s*('.*')", line)
+        #print(match)
+        if len(match) > 0:
+            return match[0]
+
 
 # build or append user activity to the supersploit log.
 def log_builder(log):
@@ -127,7 +140,7 @@ def log_builder(log):
     log_file.write(file_name_date("%a %b %d %Y %I:%M:%S %p    ") + log + "\n")
     
 
-# User input validation function.
+# user input validation function.
 def input_check(usr_prompt, error, is_valid, valid_list):
     user_input = input(usr_prompt)
     while not is_valid(user_input, valid_list):
@@ -155,8 +168,8 @@ def main():
     print(banner_message("start"))
 
     # User input search paramenters.
-    input_os = input("Plz type the target OS.   ")
-    input_target = input("plz type the target service or application.    ")
+    input_os = input("Please type the target OS.   ")
+    input_target = input("Please type the target service or application.    ")
     choice = input_check("Type L for local exploits OR M for Metaspolits    ", "Invalid input. Expected L or M.", validate_list, ["M", "m", "L", "l"])
     metasploitable = False
  
@@ -172,7 +185,6 @@ def main():
     if len(reference_list) == 0:
         print("Your OS input: " + input_os + " and/or your target service input: " + input_target + " yeilded absolutely no results. You should check your input and")
         return print(banner_message("again"))
-        
 
     # user selects which exploit they want
     copy = input_check("Which exploit do you want?    ", "Invalid input. Expected digits from provided list.", validate_number, range(0, len(reference_list)))
@@ -181,18 +193,21 @@ def main():
     if metasploitable == True:
         print(banner_message("wait"))
         tmp_file = metasploit_open(reference_list, copy)
+        runcommand("rm -r %s" % (tmp_file))
     else:
         file_cp_dest = input_check("Type C copy to current directory OR T copy to /tmp    ", "Invalid input. Expected C or T", validate_list, ["C", "c", "T", "t"])
         if file_cp_dest in ["c", "C"]:
             final_file_path = "."
         elif file_cp_dest in ["t", "T"]:
             final_file_path = "/tmp"
-        copy_exploit(reference_list, final_file_path, copy)
+        exploit_name = input("What do you want to call your exploit?    ")
+        copy_exploit(reference_list, final_file_path + "/" + exploit_name, copy)
     
-    print(tmp_file)
-    runcommand("rm -r %s" % (tmp_file))
+    
     # farewell message
     print(banner_message("end"))
  
 if __name__ == '__main__':
     main()
+    
+    
