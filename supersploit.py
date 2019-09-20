@@ -10,7 +10,6 @@ import subprocess
 import datetime
 import os
 import re
-
  
 # banner printing function
 def banner_message(message):
@@ -202,7 +201,6 @@ def main():
             final_file_path = "/tmp"
         exploit_name = input("What do you want to call your exploit?    ")
         copy_exploit(reference_list, final_file_path + "/" + exploit_name, copy)
-    
     
     # farewell message
     print(banner_message("end"))
