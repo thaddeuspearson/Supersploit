@@ -96,8 +96,10 @@ def local_or_metasploit(is_metasploit, target_os, target):
  
 
 # copy the user selected exploit.
-def copy_exploit(list_of_lists, copy_pathway, exploit_num):
-    exploit = list_of_lists[int(exploit_num) - 1][1]
+def copy_exploit(exploit_list, copy_pathway, exploit_num):
+    desc = exploit_list[int(exploit_num) - 1][0]
+    exploit = exploit_list[int(exploit_num) - 1][1]
+    log_builder(desc)
     all_exploit_path = "/usr/share/exploitdb/" + exploit
     runcommand("cp " + all_exploit_path + " " + copy_pathway)
     
