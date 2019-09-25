@@ -1,6 +1,7 @@
 # Supersploit
 A better way to search for exploits...
 
+Here is a presentation demostrating Supersploit https://www.youtube.com/watch?v=YpJz1QO7bo0&list=PLx0iOsdUOUmnQ5cgXOUr4KK_bgLHBi_gU&index=1
 
 Supersploit requires Searchsploit and Metasploit to run.  
 
